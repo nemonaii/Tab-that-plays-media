@@ -1,0 +1,48 @@
+/* === CUSTOM RANGE SLIDER VISUALS === */
+input[type=range]
+{
+	appearance: none;
+
+	margin: 0 4px;
+
+	background-color: transparent;
+	cursor: grab;
+}
+input[type=range]:active
+{
+	cursor: grabbing;
+}
+input[disabled]
+{
+	cursor: not-allowed !important;
+	filter: grayscale(1) brightness(1);
+}
+input[type=range]::-webkit-slider-thumb
+{
+	appearance: none;
+	width: 6px; height: 16px;
+	border: 1px solid black;
+
+	background-color: var(--blue-light);
+	/*background: radial-gradient(circle at center, var(--blue-light), var(--blue));*/
+	margin-top: -6px;
+}
+input[type=range]::-webkit-slider-runnable-track
+{
+	height: 6px;
+
+	background: linear-gradient(90deg, var(--blue), var(--blue-light) var(--value), var(--back) var(--value));
+	border: 1px solid black;
+	border-radius: 4px;
+}
+
+input[type=range]:active::-webkit-slider-thumb,
+input[type=range]:active::-webkit-slider-runnable-track
+{
+	filter: brightness(90%);
+}
+input[type=range]:focus { outline: none; }
+
+
+
+/* lemocha - lemocha7.github.io */

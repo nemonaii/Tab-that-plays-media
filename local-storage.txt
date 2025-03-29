@@ -1,0 +1,9 @@
+"Tab that plays media" uses Local Storage to store these settings:
+
+	"ttpm/volume":              playing volume of media
+	"ttpm/loop":                if media loops when ended
+	"ttpm/video-hide":          if video is displayed or not
+	"ttpm/set-titleScroll":     webpage title will scroll if too long
+	"ttpm/set-ignoreTitle":     when setting media title, always ignore ID3 metadata
+
+With Local Storage blocked, the app will still work BUT these settings will not be saved when exiting / reloading.

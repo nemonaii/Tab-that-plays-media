@@ -1,0 +1,248 @@
+<!DOCTYPE html><html lang="en">
+<head>
+	<title>Tab that plays media</title>
+	<link rel="shortcut icon" type="image/png" href="img/audio.png">
+	<link rel="stylesheet" href="style.css">
+	<link rel="stylesheet" href="custom-input-visuals.css">
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+	<meta name="description" content="A media player that fits in a browser tab.">
+	<meta name="keywords" content="media player browser tab id3 open source github mp3 mp4 wav ogg weba webm">
+</head>
+
+<body onresize="menu.pass()">
+<!-- TOP BAR -->
+	<div class="bar top">
+		<div class="row1">
+			<img id="appIcon" width="24" height="24" src="img/empty.png" onclick="menu.open('about', menu.DOM.about, this)">
+			<div class="center">
+				<img id="idMediaDisc" src="img/ui/cd.svg">
+				<span id="idTitle" onclick="menu.open('id3', menu.DOM.id3, this)">Tab that plays media</span>
+			</div>
+		</div>
+
+		<div class="row2">
+			<!-- onclick="menu.close()"  -->
+			<details id="idDropButton" onmouseover="this.open = true" onmouseleave="this.open = false" onclick="event.preventDefault()">
+				<summary>Media</summary>
+				<div id="idDropMenu" class="dropdown-bar">
+					<button onclick="media.open()" title="Open new media">Open</button>
+					<button onclick="media.close()" disabled title="Close currently opened media">Close</button>
+					<button onclick="media.rescue()" disabled title="Re-open recently closed media">Rescue</button>
+					<button onclick="menu.open('id3', menu.DOM.id3, controlDOM.title)" disabled title="View media ID3 metadata">Metadata</button>
+				</div>
+			</details>
+			<button onclick="menu.open('controls', menu.DOM.controls, this)">Controls</button>
+			<button onclick="menu.open('set',      menu.DOM.settings, this)">Settings</button>
+			<button onclick="menu.open('about',    menu.DOM.about,    this)">About</button>
+		</div>
+	</div>
+
+	<noscript class="control-bar" style="background-color: darkred; margin: 0 0 40px">This app requires JavaScript to function.</noscript>
+
+<!-- FILE INPUT AREA -->
+	<div class="file-area" onclick="media.open()">
+		<img src="img/file.svg" width="150">
+		<span class="big">no file open</span>
+		<small>click to open file prompt or drag a file here</small>
+	</div>
+	<input id="idInput" type="file" style="display: none">
+
+
+<!-- LOADING BAR -->
+	<div id="idLoadDiv" style="display: none">
+		<span id="idLoadText"></span>
+		<progress id="idLoad"></progress>
+	</div>
+
+<!-- AUDIO / VIDEO -->
+	<div>
+		<audio id="idAudio"></audio>
+		<video id="idVideo" onclick="media.stateToggle()"></video>
+	</div>
+
+	<div id="idID3ImgContainer">
+		<img id="idID3Img">
+	</div>
+
+
+<!-- MEDIA CONTROLS -->
+	<div id="idControlContainer" class="control-bar disabled">
+		<div class="control">
+			<!-- find way to remove disabled property from audio state -->
+			<img id="idMediaState" src="img/pause.svg" onclick="media.stateToggle()">
+			<span id="idMediaLengthEmpty">0:0</span><span id="idMediaLength">0</span> / <span id="idMediaLengthMax">0:00</span>
+			<input id="idMediaProgress" type="range" value="50" disabled style="--value: 50%">
+
+			<img src="img/skip.svg" onclick="media.progressChange(-5)" title="Skip backwards 5s">
+			<img src="img/skip.svg" style="transform: rotateY(180deg)" onclick="media.progressChange(5)" title="Skip forward 5s">
+
+			<img id="idVolumeStatus" src="img/volume.svg">
+
+			<span id="idVolumeTEmpty"></span><span id="idVolumeT">100</span>%
+		</div>
+
+<!-- MEDIA SETTINGS -->
+		<div class="control">
+			<img id="idButtonLoop" src="img/skip.svg">
+
+			<div id="idVideoControls">
+				<img id="idButtonVideo" src="img/ui/novideo.svg">
+			</div>
+		</div>
+
+<!-- VOLUME SLIDER -->
+		<div id="idVolumeContainer">
+			<input id="idVolume" type="range" max="100" value="100" style="--value: 100%">
+		</div>
+	</div>
+
+
+
+	<div id="menuContainer">
+		<div class="squigContainer" style="display: none; position: fixed">
+			<img src="img/squiggle/tl.svg" class="tl">
+			<img src="img/squiggle/tr.svg" class="tr">
+			<img src="img/squiggle/bl.svg" class="bl">
+			<img src="img/squiggle/br.svg" class="br">
+		</div>
+
+		<div class="point" style="display: none"></div>
+
+		<div class="menu" id="idMenuID3">
+			<header>Media Metadata</header>
+			<table id="idID3Table"></table>
+			<span id="idID3Empty">media does not have ID3 metadata.</span>
+		</div>
+
+		<div class="menu" id="idMenuSettings">
+			<header>Settings</header>
+
+			<div onclick="settings.click('titleScroll', this.childNodes[1]); media.titleScrollCheck(); media.setTitle()">
+				<input type="checkbox" checked>
+				Website Title Scrolling
+				<br>
+				<small>The webpage title will scroll when media title is too long</small>
+			</div>
+
+			<div onclick="settings.click('ignoreTitle', this.childNodes[1]); media.setTitle('load')">
+				<input type="checkbox">
+				Ignore ID3 Title
+				<br>
+				<small>Title will always be the file name, regardless of media metadata.</small>
+			</div>
+		</div>
+
+		<div class="menu" id="idMenuControls">
+			<header>Controls</header>
+			<table>
+				<tr>
+					<td>
+						<p>⬅/⮕</p>
+						<p>J/L</p>
+						<p>A/D</p>
+					</td>
+					<td>Seek 5 seconds backwards/forwards</td>
+				</tr>
+
+				<tr>
+					<td>
+						<p>⬆/⬇</p>
+						<p>W/S</p>
+						<p>Scroll wheel over control bar</p>
+					</td>
+					<td>Volume up/down by 5%</td>
+				</tr>
+
+				<tr>
+					<td>
+						<p>Space</p>
+						<p>K</p>
+					</td>
+					<td>Play/pause</td>
+				</tr>
+
+				<tr>
+					<td style="border-bottom: none">
+						<p>M</p>
+					</td>
+					<td>Mute media</td>
+				</tr>
+			</table>
+		</div>
+
+		<div class="menu" id="idMenuAbout">
+			<header>About</header>
+			Tab that plays media <code><a href="https://github.com/lemocha7/tab-that-plays-media/releases/tag/v1.0-pre" style="font-size: var(--fsize-small)">v1.0-pre</a></code>
+			<br>
+			<small>A media player that fits in a browser tab.</small>
+			<br><br>
+
+			<img style="--offset: 0s" src="img/audio.png"><img style="--offset: .5s" src="img/video.png"><img style="--offset: 1s" src="img/empty.png">
+			<br>
+
+			<small>Using <a href="https://github.com/aadsm/jsmediatags" target="_blank">jsmediatags</a> v3.9.7</small> ·
+			<small><a href="local-storage.txt"  target="_blank">local storage usage</a></small>
+			<br>
+			<small><a href="https://lemocha7.github.io" target="_blank">lemocha</a> <code>2023</code> - <code>2024</code></small>
+		</div>
+	</div>
+
+<!-- STATUS BAR / BOTTOM BAR -->
+	<div class="status bar">
+		<div>
+			<span id="idInfoFormat">No media open</span>
+		</div>
+
+		<div>
+			<code id="idInfoRes"></code>
+			<code id="idInfoSize"></code>
+		</div>
+	</div>
+</body>
+
+<!--<script src="../lib-ext/jsmediatags-3.9.7.js"></script>-->
+<!--<script src="../../../lib-ext/jsmediatags-3.9.7.js"></script>-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsmediatags/3.9.5/jsmediatags.min.js"></script>
+<script src="script.js"></script>
+<script src="menu.js"></script>
+<script src="id3.js"></script>
+<script src="events.js"></script>
+<script>
+	// copy local storage settings
+	if (localStorage.getItem("ttpm/loop") === "true")
+	{
+		media.loop = false;
+	}
+	if (localStorage.getItem("ttpm/video-hide") === "true")
+	{
+		media.videoHide = false;
+	}
+	if (localStorage.getItem("ttpm/set-titleScroll") === "false")
+	{
+		menu.DOM.settings.getElementsByTagName("div")[0].click();
+	}
+	if (localStorage.getItem("ttpm/set-ignoreTitle") === "true")
+	{
+		menu.DOM.settings.getElementsByTagName("div")[1].click();
+	}
+
+	controlDOM.videoHide.click();
+	controlDOM.mediaLoop.click();
+	controlDOM.volumeStatus.click();
+	app.iconChange("empty");
+
+	if (localStorage.getItem("ttpm/volume") !== null)
+	{
+		media.setVolume(localStorage.getItem("ttpm/volume"))
+	}
+
+	// attempt media rescue if tab was reopened with Ctrl+Shift+T
+	window.setTimeout(() => media.rescue(), 100);
+</script>
+</html>
+
+
+
+<!-- lemocha - lemocha7.github.io -->
