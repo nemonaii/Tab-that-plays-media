@@ -1,10 +1,9 @@
-# ![](img/audio.png) ![](img/video.png) Tab that plays media
+# <img src="img/audio.png" height=24> <img src="img/video.png" height=24> Tab that plays media <img src="img/video.png" height=24> <img src="img/audio.png" height=24>
 A media player that fits in a browser tab.
 
-NOTE: this app is still in pre-release and might be a little buggy.
+*NOTE: this app is still in pre-release and might be a little buggy.*
 
-![Screenshot of app](readme-images/full.webp)
-![Example of video being played](readme-images/video.webp)
+<img src="readme-images/full.webp"  height=160> <img src="readme-images/video.webp" height=160>
 
 
 # Features
