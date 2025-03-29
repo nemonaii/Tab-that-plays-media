@@ -3,7 +3,7 @@ A media player that fits in a browser tab.
 
 *NOTE: this app is still in pre-release and might be a little buggy.*
 
-<img src="readme-images/full.webp"  height=160> <img src="readme-images/video.webp" height=160>
+<img src="readme-images/full.webp" height=200> <img src="readme-images/video.webp" height=200>
 
 
 # Features
